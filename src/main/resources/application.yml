@@ -1,0 +1,3 @@
+#    configuration-processor links for params
+param:
+  ping: Test-Connection
