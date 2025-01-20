@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.io.IOException;
@@ -28,11 +27,16 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show(); // Показ окна
 
+        // Обработка завершения работы
+        HelloController controller = fxmlLoader.getController();
+        stage.setOnCloseRequest(event -> controller.shutdown());
+
         // После показа устанавливаем координаты окна по центру экрана
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
         stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
     }
+
 
     public static void main(String[] args) {
         launch();

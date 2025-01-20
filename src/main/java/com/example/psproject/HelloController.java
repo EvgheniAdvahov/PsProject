@@ -1,6 +1,7 @@
 package com.example.psproject;
 
 import com.example.psproject.properties.Param;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -10,9 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.StringJoiner;
 
 
@@ -43,15 +42,190 @@ public class HelloController {
     @FXML
     private Button pingButton;
 
+    private Process powerShellProcess;
+    private BufferedWriter commandWriter;
+    private BufferedReader outputReader;
+
+
+
+//    @FXML
+//    private void initialize() {
+//        // Установка действия на кнопку добавления
+//        addButton.setOnAction(event -> addItemToList());
+//        clearButton.setOnAction(event -> clearItemInList());
+//        displayButton.setOnAction(event -> displayToRichText());
+//        pingButton.setOnAction(event -> pingToRichText());
+//    }
+
+    private volatile boolean isProcessRunning = true;  // Флаг для контроля процесса
+    private Thread outputThread;
+
+
+    public void initialize() {
+        try {
+            // Запуск PowerShell в интерактивном режиме
+            powerShellProcess = new ProcessBuilder("pwsh", "-NoExit", "-Command", "-")
+                    .redirectErrorStream(true)
+                    .start();
+
+            commandWriter = new BufferedWriter(new OutputStreamWriter(powerShellProcess.getOutputStream()));
+            outputReader = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()));
+
+            // Поток для чтения данных из PowerShell
+            outputThread = new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = outputReader.readLine()) != null) {
+                        String finalLine = line;
+                        Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
+                    }
+                } catch (IOException e) {
+                    if (powerShellProcess.isAlive()) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            outputThread.start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
-    private void initialize() {
-        // Установка действия на кнопку добавления
-        addButton.setOnAction(event -> addItemToList());
-        clearButton.setOnAction(event -> clearItemInList());
-        displayButton.setOnAction(event -> displayToRichText());
-        pingButton.setOnAction(event -> pingToRichText());
+    private void onRunCommand() {
+        // Проверяем, если процесс завершен или не существует, создаем новый
+        if (powerShellProcess == null || !powerShellProcess.isAlive()) {
+            initializePowerShellProcess();  // Перезапускаем процесс
+        }
+
+        String command = MyTextField.getText();
+        if (command.isEmpty()) {
+            MyTextArea.appendText("Please enter a command.\n");
+            return;
+        }
+
+        try {
+            // Отправка команды в PowerShell
+            commandWriter.write(command);
+            commandWriter.newLine();
+            commandWriter.flush();
+            MyTextField.clear();
+        } catch (IOException e) {
+            MyTextArea.appendText("Error sending command: " + e.getMessage() + "\n");
+        }
     }
+
+    private void initializePowerShellProcess() {
+        try {
+            // Закрыть старые потоки и процесс перед созданием нового
+            closeStreams();
+
+            // Запуск PowerShell в интерактивном режиме
+            powerShellProcess = new ProcessBuilder("pwsh", "-NoExit", "-Command", "-")
+                    .redirectErrorStream(true)
+                    .start();
+
+            commandWriter = new BufferedWriter(new OutputStreamWriter(powerShellProcess.getOutputStream()));
+            outputReader = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()));
+
+            // Поток для чтения данных из PowerShell
+            outputThread = new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = outputReader.readLine()) != null) {
+                        String finalLine = line;
+                        Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
+                    }
+                } catch (IOException e) {
+                    if (powerShellProcess.isAlive()) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            outputThread.start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @FXML
+    public void onStopCommand() {
+        if (powerShellProcess != null && powerShellProcess.isAlive()) {
+            powerShellProcess.destroy();  // Прерывает выполнение команды
+            MyTextArea.appendText("Command stopped.\n");
+        }
+
+        // Останавливаем поток чтения, если он существует
+        if (outputThread != null && outputThread.isAlive()) {
+            try {
+                outputThread.interrupt();  // Прерываем поток чтения
+                outputThread.join();       // Дожидаемся завершения потока
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Закрытие потоков
+        closeStreams();
+        powerShellProcess = null;  // Убираем ссылку на процесс
+        outputThread = null;       // Убираем ссылку на поток
+    }
+
+
+    private void closeStreams() {
+        try {
+            if (commandWriter != null) {
+                commandWriter.close();
+                commandWriter = null;  // Обнуляем ссылку на writer
+            }
+            if (outputReader != null) {
+                outputReader.close();
+                outputReader = null;  // Обнуляем ссылку на reader
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
+    public void shutdown() {
+        try {
+            if (powerShellProcess != null) {
+                // Отправить команду завершения PowerShell
+                commandWriter.write("exit");
+                commandWriter.newLine();
+                commandWriter.flush();
+
+                // Дождаться завершения процесса
+                powerShellProcess.waitFor();
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            // Закрыть потоки
+            try {
+                if (commandWriter != null) commandWriter.close();
+                if (outputReader != null) outputReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Принудительное уничтожение процесса (если не завершился)
+            if (powerShellProcess != null && powerShellProcess.isAlive()) {
+                powerShellProcess.destroy();
+            }
+        }
+    }
+
+
 
     private void pingToRichText() {
         int itemCount = myListView.getItems().size();
