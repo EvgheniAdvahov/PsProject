@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,36 +62,58 @@ public class HelloController {
     private Thread outputThread;
 
 
+    @FXML
     public void initialize() {
-        try {
-            // Запуск PowerShell в интерактивном режиме
-            powerShellProcess = new ProcessBuilder("pwsh", "-NoExit", "-Command", "-")
-                    .redirectErrorStream(true)
-                    .start();
+        Platform.runLater(() -> {
+            try {
+                // Обработчик нажатия клавиш для всей сцены
+                if (MyTextField != null && MyTextField.getScene() != null) {
+                    MyTextField.getScene().setOnKeyPressed(event -> {
+                        // Если нажата комбинация Ctrl+C
+                        if (event.isControlDown() && event.getCode() == KeyCode.C) {
+                            onStopCommand();  // Вызываем метод Stop
+                            event.consume();  // Устанавливаем consume, чтобы событие не передавалось дальше
+                        }
 
-            commandWriter = new BufferedWriter(new OutputStreamWriter(powerShellProcess.getOutputStream()));
-            outputReader = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()));
-
-            // Поток для чтения данных из PowerShell
-            outputThread = new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = outputReader.readLine()) != null) {
-                        String finalLine = line;
-                        Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
-                    }
-                } catch (IOException e) {
-                    if (powerShellProcess.isAlive()) {
-                        e.printStackTrace();
-                    }
+                        // Если нажата клавиша Enter
+                        if (event.getCode() == KeyCode.ENTER) {
+                            onRunCommand();  // Вызываем метод Run
+                            event.consume();  // Устанавливаем consume для предотвращения дальнейшей обработки
+                        }
+                    });
                 }
-            });
-            outputThread.start();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                // Запуск PowerShell в интерактивном режиме
+                powerShellProcess = new ProcessBuilder("pwsh", "-NoExit", "-Command", "-")
+                        .redirectErrorStream(true)
+                        .start();
+
+                commandWriter = new BufferedWriter(new OutputStreamWriter(powerShellProcess.getOutputStream()));
+                outputReader = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()));
+
+                // Поток для чтения данных из PowerShell
+                outputThread = new Thread(() -> {
+                    try {
+                        String line;
+                        while ((line = outputReader.readLine()) != null) {
+                            String finalLine = line;
+                            Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
+                        }
+                    } catch (IOException e) {
+                        if (powerShellProcess.isAlive()) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                outputThread.start();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
+
+
 
     @FXML
     private void onRunCommand() {
@@ -191,11 +214,6 @@ public class HelloController {
     }
 
 
-
-
-
-
-
     public void shutdown() {
         try {
             if (powerShellProcess != null) {
@@ -226,7 +244,6 @@ public class HelloController {
     }
 
 
-
     private void pingToRichText() {
         int itemCount = myListView.getItems().size();
         if (itemCount == 0) return;
@@ -244,9 +261,6 @@ public class HelloController {
         MyTextArea.setText(result);
         System.out.println(result);
     }
-
-
-
 
     private void displayToRichText() {
         // Используем StringJoiner для автоматического добавления запятых
