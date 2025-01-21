@@ -22,7 +22,7 @@ public class MySpringBootFXApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("PowerShellWindow.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 601);
 
         // Отключаем возможность изменять размер окна

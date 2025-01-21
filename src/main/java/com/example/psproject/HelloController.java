@@ -17,11 +17,6 @@ public class HelloController {
 
 
     private Param param;
-    @FXML
-    private ListView<String> myListView;
-
-    @FXML
-    private Button addButton;
 
     @FXML
     private TextArea MyTextArea;
@@ -29,28 +24,11 @@ public class HelloController {
     @FXML
     private TextField MyTextField;
 
-    @FXML
-    private Button clearButton;
-
-    @FXML
-    private Button displayButton;
-
-    @FXML
-    private Button pingButton;
 
     private Process powerShellProcess;
     private BufferedWriter commandWriter;
     private BufferedReader outputReader;
 
-
-//    @FXML
-//    private void initialize() {
-//        // Установка действия на кнопку добавления
-//        addButton.setOnAction(event -> addItemToList());
-//        clearButton.setOnAction(event -> clearItemInList());
-//        displayButton.setOnAction(event -> displayToRichText());
-//        pingButton.setOnAction(event -> pingToRichText());
-//    }
 
     private volatile boolean isProcessRunning = true;  // Флаг для контроля процесса
     private Thread outputThread;
@@ -166,7 +144,6 @@ public class HelloController {
         }
     }
 
-
     @FXML
     public void onStopCommand() {
         if (powerShellProcess != null && powerShellProcess.isAlive()) {
@@ -190,7 +167,6 @@ public class HelloController {
         outputThread = null;       // Убираем ссылку на поток
     }
 
-
     private void closeStreams() {
         try {
             if (commandWriter != null) {
@@ -205,7 +181,6 @@ public class HelloController {
             e.printStackTrace();
         }
     }
-
 
     public void shutdown() {
         try {
@@ -236,65 +211,12 @@ public class HelloController {
         }
     }
 
-
-    private void pingToRichText() {
-        int itemCount = myListView.getItems().size();
-        if (itemCount == 0) return;
-
-        String command;
-        if (itemCount > 1) {
-            StringJoiner joiner = new StringJoiner(",", "@(", ")");
-            myListView.getItems().forEach(item -> joiner.add("\"" + item + "\""));
-            command = "Test-Connection " + joiner;
-        } else {
-            command = param.getPING() + myListView.getItems().get(0);
-        }
-
-        String result = executePowerShellCommand(command);
-        MyTextArea.setText(result);
-        System.out.println(result);
-    }
-
-    private void displayToRichText() {
-        // Используем StringJoiner для автоматического добавления запятых
-        StringJoiner joiner = new StringJoiner(",", "@(", ")");
-        for (String item : myListView.getItems()) {
-            joiner.add("\"" + item + "\""); // Добавляем элементы в кавычках
-        }
-        // Очистка поля ввода и установка текста в TextArea
-        MyTextField.clear();
-        MyTextArea.setText(joiner.toString());
-    }
-
-
-    private void addItemToList() {
-        String text = MyTextField.getText();
-        if (!text.isEmpty()) {
-            myListView.getItems().add(text);
-            MyTextField.clear(); // очищает поле после добавления
-        }
-    }
-
-    private void clearItemInList() {
-        myListView.getItems().clear();
-    }
-
-
     @FXML
     protected void onButtonGetProcClick() {
         // Вызов PowerShell команды "Get-Process"
         String result = executePowerShellCommand("Get-Process");
         MyTextArea.setText(result);
     }
-
-    @FXML
-    protected void onButtonRunClick() {
-//        String result = executePowerShellCommand("Get-Process");
-        String result = executePowerShellCommand(MyTextField.getText());
-        System.out.println(MyTextField.getText());
-        MyTextArea.setText(result);
-    }
-
 
     // Метод для выполнения команды PowerShell
     private String executePowerShellCommand(String command) {
@@ -326,6 +248,5 @@ public class HelloController {
 
         return output.toString();
     }
-
 
 }
