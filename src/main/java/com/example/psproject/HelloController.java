@@ -8,14 +8,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.StringJoiner;
-
-
 
 
 public class HelloController {
@@ -48,7 +43,6 @@ public class HelloController {
     private BufferedReader outputReader;
 
 
-
 //    @FXML
 //    private void initialize() {
 //        // Установка действия на кнопку добавления
@@ -69,10 +63,10 @@ public class HelloController {
                 // Обработчик нажатия клавиш для всей сцены
                 if (MyTextField != null && MyTextField.getScene() != null) {
                     MyTextField.getScene().setOnKeyPressed(event -> {
-                        // Если нажата комбинация Ctrl+C
-                        if (event.isControlDown() && event.getCode() == KeyCode.C) {
+                        // Если нажата клавиша Esc
+                        if (event.getCode() == KeyCode.ESCAPE) {
                             onStopCommand();  // Вызываем метод Stop
-                            event.consume();  // Устанавливаем consume, чтобы событие не передавалось дальше
+                            event.consume();  // Устанавливаем consume для предотвращения дальнейшей обработки
                         }
 
                         // Если нажата клавиша Enter
@@ -112,7 +106,6 @@ public class HelloController {
             }
         });
     }
-
 
 
     @FXML
@@ -274,8 +267,6 @@ public class HelloController {
     }
 
 
-
-
     private void addItemToList() {
         String text = MyTextField.getText();
         if (!text.isEmpty()) {
@@ -284,7 +275,7 @@ public class HelloController {
         }
     }
 
-    private void clearItemInList(){
+    private void clearItemInList() {
         myListView.getItems().clear();
     }
 

@@ -18,8 +18,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javafx.version>23.0.1</javafx.version>
     <junit.version>5.10.2</junit.version>
-    <maven.compiler.source>17</maven.compiler.source> <!-- Укажи нужную версию Java -->
-    <maven.compiler.target>17</maven.compiler.target> <!-- Укажи нужную версию Java -->
+    <maven.compiler.source>23.0.1</maven.compiler.source> <!-- Укажи нужную версию Java -->
+    <maven.compiler.target>23.0.1</maven.compiler.target> <!-- Укажи нужную версию Java -->
   </properties>
 
   <dependencies>
@@ -62,6 +62,16 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Зависимость для @ConfigurationProperties -->
     <dependency>
@@ -100,8 +110,7 @@
           </execution>
         </executions>
         <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
+
           <launcher>app</launcher>
         </configuration>
       </plugin>
