@@ -1,5 +1,6 @@
 package com.example.psproject;
 
+import com.example.psproject.controller.PowershellController;
 import com.example.psproject.properties.Param;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +18,7 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("PowerShellWindow.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("powershellWindow.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 601);
 
         // Отключаем возможность изменять размер окна
@@ -28,7 +29,7 @@ public class HelloApplication extends Application {
         stage.show(); // Показ окна
 
         // Обработка завершения работы
-        HelloController controller = fxmlLoader.getController();
+        PowershellController controller = fxmlLoader.getController();
         stage.setOnCloseRequest(event -> controller.shutdown());
 
         // После показа устанавливаем координаты окна по центру экрана

@@ -1,19 +1,16 @@
-package com.example.psproject;
+package com.example.psproject.controller;
 
 import com.example.psproject.properties.Param;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
 import java.io.*;
-import java.util.StringJoiner;
 
 
-public class HelloController {
+public class PowershellController {
 
 
     private Param param;

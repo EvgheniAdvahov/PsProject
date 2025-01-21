@@ -10,4 +10,6 @@ module com.example.psproject {
 
     opens com.example.psproject to javafx.fxml;
     exports com.example.psproject;
+    exports com.example.psproject.controller;
+    opens com.example.psproject.controller to javafx.fxml;
 }
