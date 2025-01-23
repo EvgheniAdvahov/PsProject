@@ -32,7 +32,7 @@ public class HelloApplication extends Application {
         stage.setOnShown(event -> {
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
-            stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
+            stage.setY((screenBounds.getHeight() - stage.getHeight()) / 3);
         });
 
         stage.show();
