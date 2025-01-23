@@ -34,53 +34,61 @@ public class PowershellController {
     @FXML
     public void initialize() {
         Platform.runLater(() -> {
-            try {
-                // Обработчик нажатия клавиш для всей сцены
-                if (MyTextField != null && MyTextField.getScene() != null) {
-                    MyTextField.getScene().setOnKeyPressed(event -> {
-                        // Если нажата клавиша Esc
-                        if (event.getCode() == KeyCode.ESCAPE) {
-                            onStopCommand();  // Вызываем метод Stop
-                            event.consume();  // Устанавливаем consume для предотвращения дальнейшей обработки
-                        }
-
-                        // Если нажата клавиша Enter
-                        if (event.getCode() == KeyCode.ENTER) {
-                            onRunCommand();  // Вызываем метод Run
-                            event.consume();  // Устанавливаем consume для предотвращения дальнейшей обработки
-                        }
-                    });
-                }
-
-                // Запуск PowerShell в интерактивном режиме
-                powerShellProcess = new ProcessBuilder("pwsh", "-NoExit", "-Command", "-")
-                        .redirectErrorStream(true)
-                        .start();
-
-                commandWriter = new BufferedWriter(new OutputStreamWriter(powerShellProcess.getOutputStream()));
-                outputReader = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()));
-
-                // Поток для чтения данных из PowerShell
-                outputThread = new Thread(() -> {
-                    try {
-                        String line;
-                        while ((line = outputReader.readLine()) != null) {
-                            String finalLine = line;
-                            Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
-                        }
-                    } catch (IOException e) {
-                        if (powerShellProcess.isAlive()) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                outputThread.start();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            MyTextField.requestFocus();  // Устанавливаем фокус на TextField после загрузки окна
+            setupKeyboardShortcuts();  // Настройка горячих клавиш
+            startPowerShellProcess();  // Запуск PowerShell
         });
     }
+
+    private void setupKeyboardShortcuts() {
+        // Проверяем, что сцена не пустая
+        if (MyTextField != null && MyTextField.getScene() != null) {
+            // Устанавливаем обработчик на всю сцену
+            MyTextField.getScene().setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    onStopCommand();  // Обработка ESC
+                    event.consume();  // Останавливаем дальнейшее распространение события
+                }
+                if (event.getCode() == KeyCode.ENTER) {
+                    onRunCommand();  // Обработка Enter
+                    event.consume();  // Останавливаем дальнейшее распространение события
+                }
+            });
+        }
+    }
+
+    private void startPowerShellProcess() {
+        try {
+            // Запуск PowerShell
+            powerShellProcess = new ProcessBuilder("pwsh", "-NoExit", "-Command", "-")
+                    .redirectErrorStream(true)
+                    .start();
+
+            commandWriter = new BufferedWriter(new OutputStreamWriter(powerShellProcess.getOutputStream()));
+            outputReader = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()));
+
+            // Чтение данных из PowerShell
+            outputThread = new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = outputReader.readLine()) != null) {
+                        String finalLine = line;
+                        Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
+                    }
+                } catch (IOException e) {
+                    if (powerShellProcess.isAlive()) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            outputThread.setDaemon(true); // Устанавливаем поток демоном, чтобы он завершался с приложением
+            outputThread.start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     @FXML

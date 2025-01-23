@@ -24,12 +24,18 @@ public class HelloApplication extends Application {
         stage.setResizable(false);
         stage.setTitle("Main Window");
         stage.setScene(scene);
-        stage.show();
 
-        // После показа устанавливаем координаты окна по центру экрана
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
-        stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
+        // Обновляем размеры окна после загрузки сцены
+        stage.sizeToScene();
+
+        // Обработчик для того, чтобы вычислить положение окна после его отображения
+        stage.setOnShown(event -> {
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
+            stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
+        });
+
+        stage.show();
     }
 
     public static void main(String[] args) {
