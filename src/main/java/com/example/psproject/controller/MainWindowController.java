@@ -7,13 +7,24 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class MainWindowController {
 
     @FXML
-    private void openPowershellWindow() {
-        openWindow("powershellWindow.fxml", "PowershellWindow");
+    public void openPowershellWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/psproject/powershellWindow.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("PowerShell Window");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     @FXML
     private void openWindow2() {

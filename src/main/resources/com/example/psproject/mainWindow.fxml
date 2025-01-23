@@ -6,8 +6,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="313.0" prefWidth="491.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="313.0" prefWidth="491.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.psproject.controller.MainWindowController">
    <children>
       <MenuBar layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="373.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -28,7 +27,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <Button fx:id="ButtonPsWindow" layoutX="27.0" layoutY="49.0" mnemonicParsing="false" prefHeight="98.0" prefWidth="133.0" text="PsWindow" />
+      <Button fx:id="ButtonPsWindow" layoutX="27.0" layoutY="49.0" mnemonicParsing="false" onAction="#openPowershellWindow" prefHeight="98.0" prefWidth="133.0" text="PsWindow" />
       <Button fx:id="ButtonPrinterDrivers" layoutX="176.0" layoutY="49.0" mnemonicParsing="false" prefHeight="98.0" prefWidth="133.0" text="PrinterDrivers" />
       <Button layoutX="328.0" layoutY="49.0" mnemonicParsing="false" prefHeight="98.0" prefWidth="133.0" text="Button" />
    </children>

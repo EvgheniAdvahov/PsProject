@@ -18,19 +18,13 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("powershellWindow.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1000, 601);
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("mainWindow.fxml"));
+        Scene scene = new Scene(fxmlLoader.load()); // Укажите размеры основного окна
 
-        // Отключаем возможность изменять размер окна
         stage.setResizable(false);
-
-        stage.setTitle("PS Window!");
+        stage.setTitle("Main Window");
         stage.setScene(scene);
-        stage.show(); // Показ окна
-
-        // Обработка завершения работы
-        PowershellController controller = fxmlLoader.getController();
-        stage.setOnCloseRequest(event -> controller.shutdown());
+        stage.show();
 
         // После показа устанавливаем координаты окна по центру экрана
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -38,8 +32,8 @@ public class HelloApplication extends Application {
         stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
     }
 
-
     public static void main(String[] args) {
         launch();
     }
+
 }
