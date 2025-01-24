@@ -11,6 +11,20 @@ import java.io.IOException;
 public class MainWindowController {
 
     @FXML
+    public void openPrinterWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/psproject/printerWindow.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Printer Window");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     public void openPowershellWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/psproject/powershellWindow.fxml"));

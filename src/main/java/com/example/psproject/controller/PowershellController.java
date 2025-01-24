@@ -26,8 +26,6 @@ public class PowershellController {
     private BufferedWriter commandWriter;
     private BufferedReader outputReader;
 
-
-    private volatile boolean isProcessRunning = true;  // Флаг для контроля процесса
     private Thread outputThread;
 
 
@@ -133,6 +131,7 @@ public class PowershellController {
                 try {
                     String line;
                     while ((line = outputReader.readLine()) != null) {
+                        System.out.println("initializePowerShellProcess NULL");
                         String finalLine = line;
                         Platform.runLater(() -> MyTextArea.appendText(finalLine + "\n"));
                     }
